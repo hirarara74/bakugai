@@ -1,0 +1,24 @@
+@import "tailwindcss";
+
+/* 配色トークン。通販=藍+金、デリバリー=若草色（実在サービスの色とは被らせない） */
+@theme {
+  --font-sans: "Noto Sans JP", system-ui, sans-serif;
+  --color-mall: #1e2a5a;
+  --color-mall-dark: #141c3e;
+  --color-gold: #f2b632;
+  --color-eats: #2f9e5b;
+  --color-eats-dark: #1f7a43;
+  --color-paper: #f4f5f8;
+}
+
+body {
+  margin: 0;
+  background: var(--color-paper);
+  color: #1a1d29;
+  font-family: var(--font-sans);
+  font-variant-numeric: tabular-nums;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
