@@ -10,7 +10,12 @@ import Cart from './pages/shop/Cart'
 import Checkout from './pages/shop/Checkout'
 import OrderDetail from './pages/shop/OrderDetail'
 import Orders from './pages/shop/Orders'
+import FoodLayout from './components/FoodLayout'
 import FoodHome from './pages/food/Home'
+import Restaurant from './pages/food/Restaurant'
+import FoodCheckout from './pages/food/Checkout'
+import FoodOrderDetail from './pages/food/OrderDetail'
+import FoodOrders from './pages/food/Orders'
 
 export default function App() {
   const { pathname } = useLocation()
@@ -33,7 +38,13 @@ export default function App() {
             <Route path="orders" element={<Orders />} />
             <Route path="order/:id" element={<OrderDetail />} />
           </Route>
-          <Route path="food" element={<FoodHome />} />
+          <Route path="food" element={<FoodLayout />}>
+            <Route index element={<FoodHome />} />
+            <Route path="r/:id" element={<Restaurant />} />
+            <Route path="checkout" element={<FoodCheckout />} />
+            <Route path="orders" element={<FoodOrders />} />
+            <Route path="order/:id" element={<FoodOrderDetail />} />
+          </Route>
           <Route path="*" element={<p className="p-6">ページが見つかりません</p>} />
         </Routes>
       </main>

@@ -18,6 +18,10 @@ export type Order = {
   address: string
   placedAt: string // ISO。配送状況はこの時刻と playMs から毎回計算する
   playMs: number // 注文から配達完了までにかかる実時間(ms)。注文時の「配送の進み方」設定で決まる
+  // デリバリー注文のみ。shipping は 配達料+サービス料+少額手数料、total にはチップも含む
+  restaurantId?: number
+  restaurantName?: string
+  tip?: number
 }
 
 type Orders = {
