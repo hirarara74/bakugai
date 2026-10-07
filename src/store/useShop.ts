@@ -6,19 +6,42 @@ export const MAX_QTY = 99
 type CartLine = { productId: number; qty: number }
 type Shop = {
   cart: CartLine[]
+  later: number[] // 「あとで買う」に移した商品
   add: (productId: number, qty?: number) => void
+  setQty: (productId: number, qty: number) => void
+  remove: (productId: number) => void
+  toLater: (productId: number) => void
+  fromLater: (productId: number) => void
+  clear: () => void
 }
+
+const clamp = (n: number) => Math.min(MAX_QTY, Math.max(1, Math.floor(n) || 1))
 
 export const useShop = create<Shop>()(
   persist(
     (set) => ({
       cart: [],
+      later: [],
       add: (productId, qty = 1) =>
         set((s) => {
           const hit = s.cart.find((l) => l.productId === productId)
-          if (!hit) return { cart: [...s.cart, { productId, qty: Math.min(qty, MAX_QTY) }] }
-          return { cart: s.cart.map((l) => (l === hit ? { ...l, qty: Math.min(l.qty + qty, MAX_QTY) } : l)) }
+          if (!hit) return { cart: [...s.cart, { productId, qty: clamp(qty) }] }
+          return { cart: s.cart.map((l) => (l === hit ? { ...l, qty: clamp(l.qty + qty) } : l)) }
         }),
+      setQty: (productId, qty) =>
+        set((s) => ({ cart: s.cart.map((l) => (l.productId === productId ? { ...l, qty: clamp(qty) } : l)) })),
+      remove: (productId) => set((s) => ({ cart: s.cart.filter((l) => l.productId !== productId) })),
+      toLater: (productId) =>
+        set((s) => ({
+          cart: s.cart.filter((l) => l.productId !== productId),
+          later: s.later.includes(productId) ? s.later : [...s.later, productId],
+        })),
+      fromLater: (productId) =>
+        set((s) => ({
+          later: s.later.filter((id) => id !== productId),
+          cart: s.cart.some((l) => l.productId === productId) ? s.cart : [...s.cart, { productId, qty: 1 }],
+        })),
+      clear: () => set({ cart: [] }),
     }),
     { name: 'bakugai:shop:v1', version: 1 },
   ),

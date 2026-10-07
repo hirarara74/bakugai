@@ -32,6 +32,7 @@ export default function ShopLayout() {
             <button className="rounded-r-md bg-gold px-4 text-sm font-bold text-mall-dark" aria-label="検索する">検索</button>
             <datalist id="suggest">{SUGGESTIONS.map((s) => <option key={s} value={s} />)}</datalist>
           </form>
+          <Link to="/orders" className="hidden whitespace-nowrap rounded-md px-2 py-1 text-sm font-bold sm:block">注文履歴</Link>
           <Link to="/cart" className="relative whitespace-nowrap rounded-md px-2 py-1 text-sm font-bold" aria-label={`カート ${count}点`}>
             🛒 カート
             {count > 0 && <span className="ml-1 rounded-full bg-gold px-1.5 text-xs text-mall-dark">{count}</span>}
@@ -41,6 +42,7 @@ export default function ShopLayout() {
           {CATEGORIES.map((c) => (
             <Link key={c.id} to={`/search?cat=${c.id}`} className="whitespace-nowrap text-white/80 hover:text-white">{c.name}</Link>
           ))}
+          <Link to="/orders" className="whitespace-nowrap text-white/80 hover:text-white sm:hidden">注文履歴</Link>
         </nav>
       </div>
       <Outlet />
