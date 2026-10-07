@@ -12,6 +12,7 @@ type Shop = {
   remove: (productId: number) => void
   toLater: (productId: number) => void
   fromLater: (productId: number) => void
+  multiply: (k: number) => void // 「全部×10」
   clear: () => void
 }
 
@@ -41,6 +42,7 @@ export const useShop = create<Shop>()(
           later: s.later.filter((id) => id !== productId),
           cart: s.cart.some((l) => l.productId === productId) ? s.cart : [...s.cart, { productId, qty: 1 }],
         })),
+      multiply: (k) => set((s) => ({ cart: s.cart.map((l) => ({ ...l, qty: clamp(l.qty * k) })) })),
       clear: () => set({ cart: [] }),
     }),
     { name: 'bakugai:shop:v1', version: 1 },

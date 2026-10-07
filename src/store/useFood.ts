@@ -12,6 +12,7 @@ type Food = {
   add: (restaurantId: number, itemId: number, optionIds: string[], qty: number, replace?: boolean) => void
   setQty: (key: string, qty: number) => void
   remove: (key: string) => void
+  multiply: (k: number) => void // 「全部×10」
   clear: () => void
 }
 
@@ -41,6 +42,7 @@ export const useFood = create<Food>()(
           const lines = s.lines.filter((l) => l.key !== key)
           return { lines, restaurantId: lines.length ? s.restaurantId : null }
         }),
+      multiply: (k) => set((s) => ({ lines: s.lines.map((l) => ({ ...l, qty: clamp(l.qty * k) })) })),
       clear: () => set({ lines: [], restaurantId: null }),
     }),
     { name: 'bakugai:food:v1', version: 1 },

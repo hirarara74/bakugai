@@ -15,6 +15,10 @@ export function optionNames(item: MenuItem, optionIds: string[]): string[] {
   return item.groups.flatMap((g) => g.choices).filter((c) => optionIds.includes(c.id)).map((c) => c.name)
 }
 
+/** 必須グループは先頭の選択肢を選んだ状態（シートを開いた時の初期値、「全部注文」でも使う） */
+export const defaultOptionIds = (item: MenuItem): string[] =>
+  item.groups.filter((g) => g.required && g.choices.length > 0).map((g) => g.choices[0].id)
+
 /** 必須グループは1つ以上、すべてのグループが max 以下なら注文できる */
 export function selectionValid(item: MenuItem, optionIds: string[]): boolean {
   return item.groups.every((g) => {

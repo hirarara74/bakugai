@@ -11,6 +11,7 @@ import Checkout from './pages/shop/Checkout'
 import OrderDetail from './pages/shop/OrderDetail'
 import Orders from './pages/shop/Orders'
 import FoodLayout from './components/FoodLayout'
+import Stats from './pages/Stats'
 import FoodHome from './pages/food/Home'
 import Restaurant from './pages/food/Restaurant'
 import FoodCheckout from './pages/food/Checkout'
@@ -38,6 +39,7 @@ export default function App() {
             <Route path="orders" element={<Orders />} />
             <Route path="order/:id" element={<OrderDetail />} />
           </Route>
+          <Route path="stats" element={<Stats />} />
           <Route path="food" element={<FoodLayout />}>
             <Route index element={<FoodHome />} />
             <Route path="r/:id" element={<Restaurant />} />

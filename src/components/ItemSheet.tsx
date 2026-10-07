@@ -1,13 +1,13 @@
 import { useEffect, useRef, useState } from 'react'
 import type { MenuItem } from '../data/food'
-import { selectionValid, unitPrice } from '../lib/foodMoney'
+import { defaultOptionIds, selectionValid, unitPrice } from '../lib/foodMoney'
 import { yen } from '../lib/money'
 import { useFood } from '../store/useFood'
 
 /** メニューの詳細シート。スマホでは下から出る。<dialog> の標準機能で開閉する（ESCキー・背景クリックで閉じる） */
 export default function ItemSheet({ item, onClose }: { item: MenuItem; onClose: () => void }) {
   const ref = useRef<HTMLDialogElement>(null)
-  const [picked, setPicked] = useState<string[]>(() => item.groups.filter((g) => g.required && g.choices.length > 0).map((g) => g.choices[0].id))
+  const [picked, setPicked] = useState<string[]>(() => defaultOptionIds(item))
   const [qty, setQty] = useState(1)
   const [ask, setAsk] = useState(false)
   const { add, conflicts } = useFood()

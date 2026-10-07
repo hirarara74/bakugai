@@ -1,4 +1,5 @@
 import { Link, useLocation, useParams } from 'react-router-dom'
+import RankUp from '../../components/RankUp'
 import Tracking from '../../components/Tracking'
 import { deliveryInfo } from '../../lib/date'
 import { yen } from '../../lib/money'
@@ -16,6 +17,7 @@ export default function OrderDetail() {
 
   return (
     <div className="space-y-4 p-3 sm:p-4">
+      {fresh && <RankUp order={order} />}
       <section className="rounded-lg bg-white p-5">
         <h2 className="text-xl font-black">{fresh ? '✓ ご注文ありがとうございます' : 'ご注文の詳細'}</h2>
         <p className="mt-1 text-sm">注文番号 <b data-testid="order-id">{order.id}</b></p>

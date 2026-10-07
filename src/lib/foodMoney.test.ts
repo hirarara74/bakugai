@@ -1,6 +1,6 @@
 import { expect, test } from 'vitest'
 import { MENU, RESTAURANTS, menuOf } from '../data/food'
-import { foodTotals, optionNames, optionsExtra, selectionValid, unitPrice } from './foodMoney'
+import { defaultOptionIds, foodTotals, optionNames, optionsExtra, selectionValid, unitPrice } from './foodMoney'
 
 const ramen = MENU.find((m) => m.name === '星空しょうゆラーメン')!
 
@@ -34,4 +34,10 @@ test('1,000円未満は不足分が少額注文手数料になる。空のカー
   expect(foodTotals(700, 0, 0)).toMatchObject({ service: 70, small: 300, total: 1070 })
   expect(foodTotals(1000, 0, 0).small).toBe(0)
   expect(foodTotals(0, 250, 300).total).toBe(0)
+})
+
+test('defaultOptionIds: 必須グループの先頭だけが選ばれ、任意は選ばれない', () => {
+  expect(defaultOptionIds(ramen)).toEqual(['size0'])
+  expect(selectionValid(ramen, defaultOptionIds(ramen))).toBe(true)
+  expect(MENU.every((m) => selectionValid(m, defaultOptionIds(m)))).toBe(true) // 全メニューがそのまま注文できる
 })

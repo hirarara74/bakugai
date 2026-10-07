@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { getMenuItem, getRestaurant } from '../../data/food'
+import { celebrate } from '../../lib/celebrate'
 import { foodPlayMs } from '../../lib/delivery'
 import { TIPS, foodTotals, optionNames, unitPrice } from '../../lib/foodMoney'
 import { yen } from '../../lib/money'
@@ -12,7 +13,7 @@ const DROPOFFS = ['玄関前に置く', '手渡し', 'ドアの前に置く（�
 
 export default function FoodCheckout() {
   const nav = useNavigate()
-  const { restaurantId, lines, setQty, remove, clear } = useFood()
+  const { restaurantId, lines, setQty, remove, multiply, clear } = useFood()
   const place = useOrders((s) => s.place)
   const { address, speed } = useProfile()
   const [tip, setTip] = useState(100)
@@ -46,6 +47,7 @@ export default function FoodCheckout() {
     })
     nav(`/food/order/${id}`, { replace: true, state: { fresh: true } })
     clear()
+    void celebrate(t.total)
   }
 
   return (
@@ -70,7 +72,10 @@ export default function FoodCheckout() {
             </li>
           ))}
         </ul>
-        <Link to={`/food/r/${r.id}`} className="inline-block text-sm font-bold text-eats-dark underline">＋ 商品を追加する</Link>
+        <div className="flex flex-wrap items-center gap-4">
+          <Link to={`/food/r/${r.id}`} className="text-sm font-bold text-eats-dark underline">＋ 商品を追加する</Link>
+          <button className="rounded-full bg-gold px-4 py-1.5 text-sm font-bold text-mall-dark" onClick={() => multiply(10)}>🔥 全部×10</button>
+        </div>
 
         <fieldset>
           <legend className="mb-2 font-bold">配達員へのチップ</legend>

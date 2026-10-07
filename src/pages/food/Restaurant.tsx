@@ -3,17 +3,26 @@ import { Link, useParams } from 'react-router-dom'
 import ItemSheet from '../../components/ItemSheet'
 import { getRestaurant, menuOf, type MenuItem } from '../../data/food'
 import { yen } from '../../lib/money'
+import { defaultOptionIds } from '../../lib/foodMoney'
 import { foodCount, useFood } from '../../store/useFood'
 
 export default function Restaurant() {
   const { id } = useParams()
   const r = getRestaurant(Number(id))
   const [item, setItem] = useState<MenuItem | null>(null)
+  const [armed, setArmed] = useState(false)
+  const { add, conflicts } = useFood()
   const count = useFood((s) => (s.restaurantId === r?.id ? foodCount(s.lines) : 0))
   if (!r) return <p className="p-6">お店が見つかりませんでした。<Link to="/food" className="font-bold text-eats-dark underline">店一覧へ</Link></p>
 
   const menu = menuOf(r.id)
   const cats = ['人気', ...new Set(menu.map((m) => m.cat))]
+  // 全メニューを、必須オプションは先頭の選択肢で1つずつカートへ。別の店のカートがある時は2回押して確定
+  const orderAll = () => {
+    if (conflicts(r.id) && !armed) return setArmed(true)
+    menu.forEach((m, i) => add(r.id, m.id, defaultOptionIds(m), 1, i === 0 && armed))
+    setArmed(false)
+  }
   const itemsOf = (c: string) => (c === '人気' ? menu.filter((m) => m.popular) : menu.filter((m) => m.cat === c))
 
   return (
@@ -24,6 +33,12 @@ export default function Restaurant() {
           <h2 className="text-xl font-black">{r.name}</h2>
           <p className="text-sm">{r.genre} ・ ★{r.rating} ・ {r.etaMin[0]}〜{r.etaMin[1]}分 ・ 配達料 {r.feeYen === 0 ? '無料' : yen(r.feeYen)}</p>
         </div>
+      </div>
+
+      <div className="px-3 pt-3 sm:px-4">
+        <button className="rounded-full bg-gold px-4 py-2 text-sm font-bold text-mall-dark" onClick={orderAll}>
+          {armed ? '別のお店のカートを空にして全部入れる？ もう一度押すと確定' : `🔥 この店のメニューを全部カートへ（${menu.length}品）`}
+        </button>
       </div>
 
       <nav aria-label="メニューのカテゴリ" className="sticky top-0 z-10 flex gap-2 overflow-x-auto border-b bg-white px-3 py-2">

@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { cartItems, toLine } from '../../lib/cart'
+import { celebrate } from '../../lib/celebrate'
 import { deliveryInfo } from '../../lib/date'
 import { playMsFor } from '../../lib/delivery'
 import { EXPRESS_FEE, STANDARD_FEE, totals, yen, type Method } from '../../lib/money'
@@ -56,6 +57,7 @@ export default function Checkout() {
     })
     nav(`/order/${id}`, { replace: true, state: { fresh: true } })
     clear()
+    void celebrate(t.total)
   }
 
   return (

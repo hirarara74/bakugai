@@ -7,7 +7,7 @@ import { FREE_SHIPPING_YEN, totals, untilFreeShipping, yen } from '../../lib/mon
 import { MAX_QTY, cartCount, useShop } from '../../store/useShop'
 
 export default function Cart() {
-  const { cart, later, setQty, remove, toLater, fromLater } = useShop()
+  const { cart, later, setQty, remove, toLater, fromLater, multiply } = useShop()
   const items = cartItems(cart)
   const t = totals(items.map((i) => ({ unitYen: i.product.priceYen, qty: i.qty })), 'standard')
   const rest = untilFreeShipping(t.subtotal)
@@ -79,6 +79,7 @@ export default function Cart() {
               <div className="flex justify-between border-t pt-2 text-lg font-black"><dt>合計（税込）</dt><dd>{yen(t.total)}</dd></div>
             </dl>
             <p className="text-xs text-gray-600">通常便なら <b>{d.label}</b> お届け</p>
+            <button className="w-full rounded-full border-2 border-gold py-2 font-bold text-mall-dark hover:bg-gold/20" onClick={() => multiply(10)}>🔥 カートの中身を全部×10</button>
             <Link to="/checkout" className="block rounded-full bg-gold py-2.5 text-center font-bold text-mall-dark hover:brightness-95">レジに進む</Link>
           </>
         )}

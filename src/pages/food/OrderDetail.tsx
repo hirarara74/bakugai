@@ -1,5 +1,6 @@
 import { lazy, Suspense, useCallback, useState } from 'react'
 import { Link, useLocation, useParams } from 'react-router-dom'
+import RankUp from '../../components/RankUp'
 import { HOME_LNGLAT, getRestaurant } from '../../data/food'
 import { useNow } from '../../hooks/useNow'
 import { FOOD_STAGES, foodStatusAt } from '../../lib/delivery'
@@ -28,6 +29,7 @@ export default function FoodOrderDetail() {
 
   return (
     <div className="space-y-4 p-3 sm:p-4">
+      {fresh && <RankUp order={order} />}
       <section className="space-y-3 rounded-lg bg-white p-5">
         <h2 className="text-xl font-black">{fresh ? '✓ ご注文ありがとうございます' : 'ご注文の状況'}</h2>
         <p className="text-sm text-gray-600">{order.restaurantName} ・ 注文番号 <span data-testid="order-id">{order.id}</span></p>
