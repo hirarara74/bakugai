@@ -1,5 +1,5 @@
 import { useSearchParams } from 'react-router-dom'
-import { CATEGORIES, getCategory } from '../../data/products'
+import { CATEGORIES, getCategory, makersInCategory } from '../../data/products'
 import { ProductGrid } from '../../components/ProductParts'
 import { PRICE_BANDS, SORTS, searchProducts } from '../../lib/search'
 
@@ -13,10 +13,11 @@ export default function Search() {
     setParams(next, { replace: true })
   }
   const items = searchProducts({
-    q: get('q'), cat: get('cat') || undefined, band: get('band'), sort: get('sort') || undefined,
+    q: get('q'), cat: get('cat') || undefined, brand: get('brand') || undefined, band: get('band'), sort: get('sort') || undefined,
     minRating: Number(get('rating')) || 0, express: get('express') === '1',
   })
-  const title = get('q') ? `「${get('q')}」の検索結果` : getCategory(get('cat'))?.name ?? 'すべての商品'
+  const makers = makersInCategory(get('cat') || undefined)
+  const title = get('brand') && !get('q') ? `${get('brand')} の商品` : get('q') ? `「${get('q')}」の検索結果` : getCategory(get('cat'))?.name ?? 'すべての商品'
   const field = 'w-full rounded-md border border-gray-300 bg-white px-2 py-1.5 text-sm'
 
   return (
@@ -29,6 +30,12 @@ export default function Search() {
               <select className={field} value={get('cat')} onChange={(e) => set('cat', e.target.value)}>
                 <option value="">すべて</option>
                 {CATEGORIES.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
+              </select>
+            </label>
+            <label className="block text-xs font-bold">メーカー
+              <select className={field} value={get('brand')} onChange={(e) => set('brand', e.target.value)}>
+                <option value="">すべて</option>
+                {makers.map((m) => <option key={m} value={m}>{m}</option>)}
               </select>
             </label>
             <label className="block text-xs font-bold">価格

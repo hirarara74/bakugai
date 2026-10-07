@@ -1,10 +1,12 @@
 import { useRef, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import FoodPhoto from '../../components/FoodPhoto'
 import { getMenuItem, getRestaurant } from '../../data/food'
 import { celebrate } from '../../lib/celebrate'
 import { foodPlayMs } from '../../lib/delivery'
 import { TIPS, foodTotals, optionNames, unitPrice } from '../../lib/foodMoney'
 import { yen } from '../../lib/money'
+import { FOOD_PAYMENTS } from '../../lib/payment'
 import { MAX_FOOD_QTY, useFood } from '../../store/useFood'
 import { useOrders, type OrderLine } from '../../store/useOrders'
 import { useProfile } from '../../store/useProfile'
@@ -19,6 +21,7 @@ export default function FoodCheckout() {
   const [tip, setTip] = useState(100)
   const [custom, setCustom] = useState(false)
   const [dropoff, setDropoff] = useState(DROPOFFS[0])
+  const [payId, setPayId] = useState(FOOD_PAYMENTS[0].id)
   const placed = useRef(false)
 
   const r = restaurantId ? getRestaurant(restaurantId) : undefined
@@ -42,7 +45,7 @@ export default function FoodCheckout() {
     }))
     const id = place({
       kind: 'food', lines: orderLines, subtotal: t.subtotal, shipping: t.fees, total: t.total, points: 0, tip: t.tip,
-      method: 'standard', slot: '', dropoff, name: address.name, address: `${address.zip} ${address.address}`,
+      method: 'standard', slot: '', dropoff, payment: payId, payFee: 0, name: address.name, address: `${address.zip} ${address.address}`,
       playMs: foodPlayMs(speed, r.etaMin), restaurantId: r.id, restaurantName: r.name,
     })
     nav(`/food/order/${id}`, { replace: true, state: { fresh: true } })
@@ -57,7 +60,7 @@ export default function FoodCheckout() {
         <ul className="divide-y">
           {rows.map(({ l, item, unit, opts }) => (
             <li key={l.key} className="flex items-center gap-3 py-3">
-              <span className="text-3xl" aria-hidden>{item.emoji}</span>
+              <FoodPhoto kind="f" id={item.id} emoji={item.emoji} hue={r.hue} className="size-14 rounded-lg text-xl" />
               <div className="min-w-0 flex-1">
                 <p className="font-bold">{item.name}</p>
                 {opts.length > 0 && <p className="text-xs text-gray-600">{opts.join('・')}</p>}
@@ -94,6 +97,17 @@ export default function FoodCheckout() {
           </div>
         </fieldset>
 
+        <fieldset className="space-y-2">
+          <legend className="mb-1 font-bold">お支払い方法</legend>
+          <p className="text-xs text-gray-600">すべて架空です。カード番号などの入力は不要で、請求は発生しません。</p>
+          {FOOD_PAYMENTS.map((p) => (
+            <label key={p.id} className="flex cursor-pointer items-start gap-3 rounded-md border p-3 text-sm has-[:checked]:border-eats has-[:checked]:bg-eats/10">
+              <input type="radio" name="pay" checked={payId === p.id} onChange={() => setPayId(p.id)} />
+              <span><b>{p.name}</b><br /><span className="text-gray-600">{p.note}</span></span>
+            </label>
+          ))}
+        </fieldset>
+
         <label className="block text-sm font-bold">受け渡し方法
           <select className="mt-1 w-full rounded-md border px-3 py-2" value={dropoff} onChange={(e) => setDropoff(e.target.value)}>
             {DROPOFFS.map((d) => <option key={d}>{d}</option>)}
@@ -111,7 +125,7 @@ export default function FoodCheckout() {
         <div className="flex justify-between"><span>チップ</span><span>{yen(t.tip)}</span></div>
         <div className="flex justify-between border-t pt-2 text-lg font-black"><span>合計（税込）</span><span data-testid="total">{yen(t.total)}</span></div>
         {t.small > 0 && <p className="text-xs text-gray-600">あと {yen(t.small)} 注文すると少額注文手数料がかかりません。</p>}
-        <p className="text-xs text-gray-600">お支払い: 爆買いマネー（残高 ∞）</p>
+        <p className="text-xs text-gray-600">お支払い: {FOOD_PAYMENTS.find((p) => p.id === payId)?.name}</p>
         <button className="w-full rounded-full bg-eats py-3 font-bold text-white hover:brightness-110" onClick={confirm}>注文を確定する</button>
         <p className="text-xs text-gray-500">※ 架空のサービスです。請求も配達も発生しません。</p>
       </aside>

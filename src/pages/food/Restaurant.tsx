@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
+import FoodPhoto from '../../components/FoodPhoto'
 import ItemSheet from '../../components/ItemSheet'
 import { getRestaurant, menuOf, type MenuItem } from '../../data/food'
 import { yen } from '../../lib/money'
@@ -28,7 +29,7 @@ export default function Restaurant() {
   return (
     <div className="pb-24">
       <div className="flex items-center gap-4 p-4" style={{ background: `linear-gradient(135deg, hsl(${r.hue} 80% 92%), hsl(${r.hue} 70% 80%))` }}>
-        <span className="text-6xl" aria-hidden>{r.emoji}</span>
+        <FoodPhoto kind="r" id={r.id} emoji={r.emoji} hue={r.hue} className="size-20 rounded-xl text-3xl" />
         <div>
           <h2 className="text-xl font-black">{r.name}</h2>
           <p className="text-sm">{r.genre} ・ ★{r.rating} ・ {r.etaMin[0]}〜{r.etaMin[1]}分 ・ 配達料 {r.feeYen === 0 ? '無料' : yen(r.feeYen)}</p>
@@ -55,7 +56,7 @@ export default function Restaurant() {
               {itemsOf(c).map((m) => (
                 <li key={m.id}>
                   <button className="flex w-full items-center gap-3 rounded-lg bg-white p-3 text-left shadow-sm hover:shadow-md" onClick={() => setItem(m)}>
-                    <span className="text-4xl" aria-hidden>{m.emoji}</span>
+                    <FoodPhoto kind="f" id={m.id} emoji={m.emoji} hue={r.hue} className="size-16 rounded-lg text-2xl" />
                     <span className="min-w-0 flex-1">
                       <span className="block font-bold">{m.name}</span>
                       <span className="block text-sm text-gray-600">{yen(m.priceYen)}{m.groups.length > 0 && '〜'}</span>

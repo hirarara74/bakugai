@@ -3,8 +3,9 @@ import { Link, useLocation, useParams } from 'react-router-dom'
 import RankUp from '../../components/RankUp'
 import { HOME_LNGLAT, getRestaurant } from '../../data/food'
 import { useNow } from '../../hooks/useNow'
-import { FOOD_STAGES, foodStatusAt } from '../../lib/delivery'
+import { FOOD_STAGES_SHORT, foodStatusAt } from '../../lib/delivery'
 import { yen } from '../../lib/money'
+import { paymentName } from '../../lib/payment'
 import { useOrders } from '../../store/useOrders'
 
 // 地図は追跡画面を開いた時にだけ読み込む（maplibre は大きいので、トップの表示を重くしない）
@@ -39,14 +40,24 @@ export default function FoodOrderDetail() {
         </p>
         <p role="status" className="font-bold" data-testid="status-label">{st.label}</p>
 
-        <ol className="grid grid-cols-5 gap-1" aria-label="注文の進み具合">
-          {FOOD_STAGES.map((s, i) => (
+        <ol className="grid grid-cols-6 gap-1" aria-label="注文の進み具合">
+          {FOOD_STAGES_SHORT.map((s, i) => (
             <li key={s} aria-current={i === st.stage ? 'step' : undefined} className="space-y-1 text-center text-[11px]">
               <span className={`block h-1.5 rounded ${i <= st.stage ? 'bg-eats' : 'bg-gray-200'}`} />
               <span className={i === st.stage ? 'font-bold' : 'text-gray-500'}>{s}</span>
             </li>
           ))}
         </ol>
+
+        {st.searching && (
+          <div role="status" className="flex items-center gap-3 rounded-lg border border-eats/40 bg-eats/10 p-4 text-sm">
+            <span className="relative flex size-3 shrink-0" aria-hidden>
+              <span className="absolute inline-flex size-full animate-ping rounded-full bg-eats opacity-75" />
+              <span className="relative inline-flex size-3 rounded-full bg-eats" />
+            </span>
+            <div><p className="font-bold">配達員を探しています…</p><p className="text-gray-600">近くの配達員にリクエストを送っています。少しお待ちください。</p></div>
+          </div>
+        )}
 
         {st.onMap && r && (
           mapFailed ? (
@@ -58,10 +69,13 @@ export default function FoodOrderDetail() {
           )
         )}
 
-        {st.onMap && (
+        {st.courierAssigned && !st.done && (
           <div className="flex items-center gap-3 rounded-lg border p-3 text-sm">
             <span className="text-3xl" aria-hidden>🛵</span>
-            <div><p className="font-bold">{courier}さん（配達員）</p><p className="text-gray-600">★4.9 ・ バイク ・ 架空の配達員です</p></div>
+            <div>
+              <p className="font-bold">{courier}さん（配達員）{st.stage === 2 && ' が決まりました'}</p>
+              <p className="text-gray-600">★4.9 ・ バイク ・ 架空の配達員です{st.stage === 2 && '。お店の準備ができ次第、受け取りに向かいます'}</p>
+            </div>
           </div>
         )}
         {st.done && <p className="rounded-md bg-green-50 p-3 text-sm">🏠 {order.dropoff}。ご利用ありがとうございました（※架空の配達です）。</p>}
@@ -77,6 +91,7 @@ export default function FoodOrderDetail() {
           <p className="flex justify-between"><span>配達料・サービス料など</span><span>{yen(order.shipping)}</span></p>
           <p className="flex justify-between"><span>チップ</span><span>{yen(order.tip ?? 0)}</span></p>
           <p className="flex justify-between text-base font-black"><span>合計（税込）</span><span data-testid="order-total">{yen(order.total)}</span></p>
+          <p className="text-xs text-gray-600">お支払い: {paymentName(order.payment)}</p>
         </div>
         <div className="mt-4 flex gap-3 font-bold">
           <Link to="/food/orders" className="rounded-full border px-4 py-2">注文履歴</Link>

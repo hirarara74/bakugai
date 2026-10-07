@@ -5,8 +5,8 @@
 
 **公開ページ: https://hirarara74.github.io/bakugai/**
 
-- 通販モード（BAKUGAI MALL）: 商品200点、検索、カート、4ステップのレジ、注文履歴、配送状況
-- デリバリーモード（BAKUGAI EATS）: 12店舗96品、オプション選択、チップ、地図つきの配達追跡
+- 通販モード（BAKUGAI MALL）: 商品400点（100品目 × 4メーカー）、メーカー比較、レビュー、検索・絞り込み、カート、4ステップのレジ（支払い方法を選択）、注文履歴、配送状況
+- デリバリーモード（BAKUGAI EATS）: 12店舗96品、オプション選択、チップ、「配達員を探しています」の待機、地図つきの配達追跡
 - 爆買い演出: 紙吹雪、累計額のカウントアップ、爆買いランク、実績バッジ、購入統計
 
 データはすべてブラウザの `localStorage` に保存され、外部へは送信されません（地図タイルの取得を除く）。
@@ -27,6 +27,14 @@ npm run build    # 本番ビルド（dist/）
 Vite / React 19 / TypeScript / Tailwind CSS v4 / Zustand / React Router（HashRouter） / MapLibre GL（OpenFreeMap） / canvas-confetti / Vitest
 
 実装計画: [docs/PLAN.md](docs/PLAN.md)
+
+## 画像について
+
+商品・メニュー・店の画像（約500枚）は、ローカルの Stable Diffusion（ComfyUI）で生成したものです。
+
+- 本体: epiCRealism（SD 1.5系）／ LoRA: Product Design Realistic minimalism（商品）、Yummy - Food Photography Studio（料理）
+- 生成: `npx tsx scripts/gen-images.ts`（ComfyUI を起動しておく。`--only p:12,f:101` で一部だけ作り直し）
+- 画像は実在のブランドやロゴを含まないことを確認していますが、AI生成のため細部が不自然な場合があります。
 
 ## 注意
 

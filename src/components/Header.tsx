@@ -15,7 +15,9 @@ export default function Header({ food }: { food: boolean }) {
     <header className={`${food ? 'bg-eats-dark' : 'bg-mall'} text-white`}>
       <div className="mx-auto max-w-[1280px] flex items-center gap-2 px-3 sm:px-4 py-3">
         <h1 className="text-sm sm:text-lg font-black tracking-wide mr-auto whitespace-nowrap">
-          {food ? 'BAKUGAI EATS' : 'BAKUGAI MALL'}
+          <Link to={food ? '/food' : '/'} aria-label={`${food ? 'BAKUGAI EATS' : 'BAKUGAI MALL'} のホームへ`}>
+            {food ? 'BAKUGAI EATS' : 'BAKUGAI MALL'}
+          </Link>
         </h1>
         <nav aria-label="モード切替" className="flex gap-1">
           <NavLink to="/" end className={tab('bg-gold !text-mall-dark')}>通販</NavLink>

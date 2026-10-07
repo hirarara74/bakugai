@@ -34,7 +34,7 @@
 | 状態 | **Zustand + `persist` ミドルウェア** | カート・注文・累計額を `localStorage` へ自動で保存。Redux は過剰 |
 | 演出 | **canvas-confetti**（約6KB） | 注文確定の紙吹雪用。自作より短く済む |
 | 地図 | **MapLibre GL JS + OpenFreeMap** | APIキー・登録・Cookieが不要で、表示回数の上限もない。配達追跡画面だけで遅延読み込みし、トップの表示速度に影響させない。OSM公式タイルは利用ポリシーが厳しく、試作向き |
-| 商品画像 | **絵文字をそのまま表示（当面）。** Windows 11 では立体の Fluent 風で表示される。Mac/スマホでは各OSの絵文字になる。見た目を全端末で揃えるなら、Microsoft Fluent Emoji 3D（MIT）の PNG を `public/` に置き、`ProductImage` だけ差し替える（フェーズ6以降の任意項目） | 立体的で「商品写真っぽい」。MITなので公開しても問題ない。使う約150枚だけ `public/` に置く（CDNには頼らない）。OpenMoji は CC BY-SA で継承義務があるため外した |
+| 商品画像 | **ローカルの Stable Diffusion（ComfyUI）で生成した画像（約500枚）を `public/img/` に置く。** 画像が無い・読めない時は絵文字に戻す。生成手順は README。当初案の Fluent Emoji 3D は不採用 |
 | テスト | **Vitest**（金額計算・配達状態の進行だけ） | お金と時間の計算は壊れると全体が嘘になるので、そこだけ自動テストを置く。画面は内蔵ブラウザで手動確認 |
 
 **入れないもの:** UIコンポーネントライブラリ（shadcn など）、バックエンド、DB、認証、画像生成。

@@ -17,14 +17,16 @@ export function shippingFee(subtotal: number, method: Method): number {
 /** 送料無料まであといくらか（0なら達成済み） */
 export const untilFreeShipping = (subtotal: number) => Math.max(0, FREE_SHIPPING_YEN - subtotal)
 
-/** 価格はすべて税込。カート・レジ・注文履歴の合計は必ずこの関数から出す */
-export function totals(lines: Line[], method: Method) {
+/** 価格はすべて税込。カート・レジ・注文履歴の合計は必ずこの関数から出す。payFee は支払い方法の手数料（代引きなど） */
+export function totals(lines: Line[], method: Method, payFee = 0) {
   const subtotal = lines.reduce((s, l) => s + l.unitYen * l.qty, 0)
   const shipping = shippingFee(subtotal, method)
-  const total = subtotal + shipping
+  const fee = subtotal === 0 ? 0 : payFee
+  const total = subtotal + shipping + fee
   return {
     subtotal,
     shipping,
+    payFee: fee,
     total,
     tax: Math.floor((total * 10) / 110), // 内消費税（10%）
     points: Math.floor(subtotal / 100), // 1%還元

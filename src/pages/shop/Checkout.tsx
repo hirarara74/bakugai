@@ -5,6 +5,7 @@ import { celebrate } from '../../lib/celebrate'
 import { deliveryInfo } from '../../lib/date'
 import { playMsFor } from '../../lib/delivery'
 import { EXPRESS_FEE, STANDARD_FEE, totals, yen, type Method } from '../../lib/money'
+import { SHOP_PAYMENTS } from '../../lib/payment'
 import { useOrders } from '../../store/useOrders'
 import { ZIP_TABLE, useProfile } from '../../store/useProfile'
 import { useShop } from '../../store/useShop'
@@ -24,12 +25,14 @@ export default function Checkout() {
   const [method, setMethod] = useState<Method>('standard')
   const [slot, setSlot] = useState(SLOTS[0])
   const [dropoff, setDropoff] = useState(DROPOFFS[0])
+  const [payId, setPayId] = useState(SHOP_PAYMENTS[0].id)
   const [zipMsg, setZipMsg] = useState('')
   const placed = useRef(false)
 
   const items = cartItems(cart)
   const lines = items.map(toLine)
-  const t = totals(lines, method)
+  const pay = SHOP_PAYMENTS.find((p) => p.id === payId)!
+  const t = totals(lines, method, pay.fee)
   const canExpress = items.every((i) => i.product.express)
   const std = deliveryInfo(new Date(), false)
   const exp = deliveryInfo(new Date(), true)
@@ -52,7 +55,7 @@ export default function Checkout() {
     placed.current = true
     const id = place({
       kind: 'shop', lines, subtotal: t.subtotal, shipping: t.shipping, total: t.total, points: t.points,
-      method, slot, dropoff, name: address.name, address: `${address.zip} ${address.address}`,
+      method, slot, dropoff, payment: pay.id, payFee: t.payFee, name: address.name, address: `${address.zip} ${address.address}`,
       playMs: playMsFor(speed, new Date(), method === 'express'),
     })
     nav(`/order/${id}`, { replace: true, state: { fresh: true } })
@@ -120,10 +123,16 @@ export default function Checkout() {
           {step === 2 && (
             <>
               <h2 className="text-lg font-black">お支払い方法</h2>
-              <label className="flex items-start gap-3 rounded-md border border-mall bg-mall/5 p-3">
-                <input type="radio" name="pay" checked readOnly />
-                <span><b>爆買いマネー</b>（残高 ∞）<br /><span className="text-sm text-gray-600">架空の電子マネーです。カード番号などの入力は一切ありません。請求は発生しません。</span></span>
-              </label>
+              <p className="rounded-md bg-gold/20 p-2 text-xs">すべて架空の支払い方法です。カード番号などの入力欄はなく、実際の請求は発生しません。実在のカード情報は入力しないでください。</p>
+              <fieldset className="space-y-2">
+                <legend className="sr-only">お支払い方法</legend>
+                {SHOP_PAYMENTS.map((p) => (
+                  <label key={p.id} className="flex cursor-pointer items-start gap-3 rounded-md border p-3 has-[:checked]:border-mall has-[:checked]:bg-mall/5">
+                    <input type="radio" name="pay" checked={payId === p.id} onChange={() => setPayId(p.id)} />
+                    <span><b>{p.name}</b>{p.fee > 0 && <span className="ml-1 text-red-700">手数料 {yen(p.fee)}</span>}<br /><span className="text-sm text-gray-600">{p.note}</span></span>
+                  </label>
+                ))}
+              </fieldset>
             </>
           )}
 
@@ -133,7 +142,7 @@ export default function Checkout() {
               <dl className="divide-y text-sm">
                 <div className="flex items-start justify-between gap-3 py-3"><div><dt className="font-bold">お届け先</dt><dd>{address.name}<br />{address.zip} {address.address}</dd></div><button className="text-mall underline" onClick={() => setStep(0)}>変更</button></div>
                 <div className="flex items-start justify-between gap-3 py-3"><div><dt className="font-bold">配送方法</dt><dd>{method === 'express' ? 'お急ぎ便' : '通常便'} ／ {eta} お届け<br />時間帯: {slot} ／ 置き配: {dropoff}</dd></div><button className="text-mall underline" onClick={() => setStep(1)}>変更</button></div>
-                <div className="flex items-start justify-between gap-3 py-3"><div><dt className="font-bold">お支払い</dt><dd>爆買いマネー</dd></div><button className="text-mall underline" onClick={() => setStep(2)}>変更</button></div>
+                <div className="flex items-start justify-between gap-3 py-3"><div><dt className="font-bold">お支払い</dt><dd>{pay.name}{pay.fee > 0 && `（手数料 ${yen(pay.fee)}）`}</dd></div><button className="text-mall underline" onClick={() => setStep(2)}>変更</button></div>
                 <div className="py-3"><dt className="mb-1 font-bold">商品</dt>
                   <dd><ul className="space-y-1">{lines.map((l) => <li key={l.productId} className="flex justify-between gap-3"><span className="line-clamp-1">{l.emoji} {l.name} × {l.qty}</span><span>{yen(l.unitYen * l.qty)}</span></li>)}</ul></dd>
                 </div>
@@ -155,6 +164,7 @@ export default function Checkout() {
           <h3 className="font-black">ご注文金額</h3>
           <div className="flex justify-between"><span>商品の小計</span><span>{yen(t.subtotal)}</span></div>
           <div className="flex justify-between"><span>送料</span><span>{t.shipping === 0 ? '無料' : yen(t.shipping)}</span></div>
+          {t.payFee > 0 && <div className="flex justify-between"><span>{pay.name.split('（')[0]}手数料</span><span>{yen(t.payFee)}</span></div>}
           <div className="flex justify-between border-t pt-2 text-lg font-black"><span>ご請求額</span><span data-testid="total">{yen(t.total)}</span></div>
           <p className="text-xs text-gray-500">（うち消費税 {yen(t.tax)}）／ 獲得ポイント {t.points}pt</p>
           <p className="text-xs text-gray-500">※ 架空のショップのため、実際の請求は発生しません。</p>

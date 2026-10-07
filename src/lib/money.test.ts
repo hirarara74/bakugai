@@ -27,6 +27,12 @@ test('複数行・お急ぎ便の合計', () => {
   expect(t).toMatchObject({ subtotal: 2960, shipping: 500, total: 3460 })
 })
 
+test('代引き手数料は合計に入り、消費税にも含まれる。空のカートには付かない', () => {
+  const t = totals([{ unitYen: 3000, qty: 1 }], 'standard', 330)
+  expect(t).toMatchObject({ subtotal: 3000, shipping: 0, payFee: 330, total: 3330, tax: 302, points: 30 })
+  expect(totals([], 'standard', 330)).toMatchObject({ payFee: 0, total: 0 })
+})
+
 test('yen は桁区切り付きで表示する', () => {
   expect(yen(1234567)).toBe('¥1,234,567')
 })

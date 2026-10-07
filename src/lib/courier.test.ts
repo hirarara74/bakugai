@@ -34,10 +34,21 @@ test('家に近づくほど、家までの距離が単調に縮む', () => {
   }
 })
 
-test('デリバリーの段階: 受付→調理中→店へ移動→配達中→到着。地図は店へ移動と配達中だけ', () => {
+test('デリバリーの段階: 受付→配達員探し→調理中→店へ移動→配達中→到着', () => {
   const placed = new Date(2026, 9, 7, 12, 0, 0)
   const order = { placedAt: placed.toISOString(), playMs: 100_000 }
   const at = (sec: number) => foodStatusAt(order, new Date(placed.getTime() + sec * 1000))
-  expect([0, 5, 45, 60, 100].map((s) => at(s).label)).toEqual(['注文受付', '調理中', '配達員が店へ移動中', '配達中', '到着'])
-  expect([0, 5, 45, 60, 100].map((s) => at(s).onMap)).toEqual([false, false, true, true, false])
+  const secs = [0, 4, 10, 14, 45, 60, 100]
+  expect(secs.map((s) => at(s).label)).toEqual(['注文受付', '配達員を探しています', '配達員を探しています', '調理中', '配達員が店へ移動中', '配達中', '到着'])
+})
+
+test('配達員を探している間は担当が決まっておらず、地図には出ない。決まるのは調理の開始から。地図は店へ移動と配達中だけ', () => {
+  const placed = new Date(2026, 9, 7, 12, 0, 0)
+  const order = { placedAt: placed.toISOString(), playMs: 100_000 }
+  const at = (sec: number) => foodStatusAt(order, new Date(placed.getTime() + sec * 1000))
+  const secs = [0, 8, 14, 45, 60, 100]
+  expect(secs.map((s) => at(s).searching)).toEqual([false, true, false, false, false, false])
+  expect(secs.map((s) => at(s).courierAssigned)).toEqual([false, false, true, true, true, true])
+  expect(secs.map((s) => at(s).onMap)).toEqual([false, false, false, true, true, false])
+  expect(at(100).done).toBe(true)
 })

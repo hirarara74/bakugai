@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
+import FoodPhoto from '../../components/FoodPhoto'
 import { GENRES, RESTAURANTS } from '../../data/food'
 
 export default function FoodHome() {
@@ -23,7 +24,7 @@ export default function FoodHome() {
         {list.map((r) => (
           <li key={r.id}>
             <Link to={`/food/r/${r.id}`} className="block overflow-hidden rounded-xl bg-white shadow-sm transition-shadow hover:shadow-md">
-              <div className="flex h-28 items-center justify-center text-6xl" style={{ background: `linear-gradient(135deg, hsl(${r.hue} 80% 92%), hsl(${r.hue} 70% 80%))` }} aria-hidden>{r.emoji}</div>
+              <FoodPhoto kind="r" id={r.id} emoji={r.emoji} hue={r.hue} className="h-36 w-full text-4xl" />
               <div className="space-y-1 p-3">
                 <h3 className="font-black">{r.name}</h3>
                 <p className="text-sm text-gray-600">{r.genre} ・ ★{r.rating}（{r.reviews.toLocaleString()}）</p>

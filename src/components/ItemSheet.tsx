@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
-import type { MenuItem } from '../data/food'
+import { getRestaurant, type MenuItem } from '../data/food'
+import FoodPhoto from './FoodPhoto'
 import { defaultOptionIds, selectionValid, unitPrice } from '../lib/foodMoney'
 import { yen } from '../lib/money'
 import { useFood } from '../store/useFood'
@@ -43,7 +44,7 @@ export default function ItemSheet({ item, onClose }: { item: MenuItem; onClose: 
     >
       <div className="space-y-4 p-5">
         <div className="flex items-start gap-3">
-          <span className="text-5xl">{item.emoji}</span>
+          <FoodPhoto kind="f" id={item.id} emoji={item.emoji} hue={getRestaurant(item.restaurantId)?.hue} className="size-24 rounded-xl text-4xl" />
           <div className="min-w-0 flex-1">
             <h2 className="text-lg font-black">{item.name}</h2>
             <p className="text-sm text-gray-600">{item.desc}</p>

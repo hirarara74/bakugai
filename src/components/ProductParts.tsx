@@ -1,19 +1,25 @@
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { discountPct, getCategory, type Product } from '../data/products'
 import { deliveryInfo } from '../lib/date'
 import { yen } from '../lib/money'
 
-/** 商品写真の代わり。カテゴリ色のグラデーション + 絵文字（Fluent Emoji 3D 画像へ差し替える時はここだけ直す） */
+/** 商品写真（AIで生成した画像）。画像が無い・読めない時は、カテゴリ色のグラデーション + 絵文字を出す */
 export function ProductImage({ p, className = '' }: { p: Product; className?: string }) {
   const hue = getCategory(p.category)?.hue ?? 220
+  const [failed, setFailed] = useState(false)
   return (
     <div
       role="img"
       aria-label={p.name}
-      className={`flex items-center justify-center select-none ${className}`}
+      className={`relative flex items-center justify-center overflow-hidden select-none ${className}`}
       style={{ background: `linear-gradient(135deg, hsl(${hue} 70% 94%), hsl(${hue} 60% 82%))` }}
     >
-      <span style={{ fontSize: '4.5rem', filter: 'drop-shadow(0 6px 6px rgb(0 0 0 / .18))' }}>{p.emoji}</span>
+      {failed ? (
+        <span style={{ fontSize: '4.5rem', filter: 'drop-shadow(0 6px 6px rgb(0 0 0 / .18))' }}>{p.emoji}</span>
+      ) : (
+        <img src={`${import.meta.env.BASE_URL}img/p/${p.id}.webp`} alt="" loading="lazy" className="size-full object-cover" onError={() => setFailed(true)} />
+      )}
     </div>
   )
 }

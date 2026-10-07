@@ -45,7 +45,12 @@ export const useShop = create<Shop>()(
       multiply: (k) => set((s) => ({ cart: s.cart.map((l) => ({ ...l, qty: clamp(l.qty * k) })) })),
       clear: () => set({ cart: [] }),
     }),
-    { name: 'bakugai:shop:v1', version: 1 },
+    {
+      name: 'bakugai:shop:v1',
+      version: 2,
+      // v1 は商品200点の時代のID。意味が変わったので、カートと「あとで買う」は引き継がない
+      migrate: (state, from) => (from < 2 ? { cart: [], later: [] } : state),
+    },
   ),
 )
 

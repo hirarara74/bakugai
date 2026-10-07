@@ -3,6 +3,7 @@ import RankUp from '../../components/RankUp'
 import Tracking from '../../components/Tracking'
 import { deliveryInfo } from '../../lib/date'
 import { yen } from '../../lib/money'
+import { paymentName } from '../../lib/payment'
 import { useOrders } from '../../store/useOrders'
 
 /** 注文完了 兼 注文詳細。注文直後（fresh）だけ「ありがとうございます」の見出しにする */
@@ -41,10 +42,12 @@ export default function OrderDetail() {
         <div className="space-y-1 border-t pt-2">
           <p className="flex justify-between"><span>小計</span><span>{yen(order.subtotal)}</span></p>
           <p className="flex justify-between"><span>送料</span><span>{order.shipping === 0 ? '無料' : yen(order.shipping)}</span></p>
+          {(order.payFee ?? 0) > 0 && <p className="flex justify-between"><span>支払い手数料</span><span>{yen(order.payFee ?? 0)}</span></p>}
           <p className="flex justify-between text-base font-black"><span>合計（税込）</span><span data-testid="order-total">{yen(order.total)}</span></p>
           <p className="text-xs text-gray-500">獲得ポイント {order.points}pt</p>
         </div>
         <p className="mt-3 text-xs text-gray-600">お届け先: {order.address}（置き配: {order.dropoff}）</p>
+        <p className="text-xs text-gray-600">お支払い: {paymentName(order.payment)}</p>
       </section>
     </div>
   )

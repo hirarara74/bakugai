@@ -8,10 +8,12 @@ export const SPEEDS: [Speed, string][] = [
 ]
 
 export const STAGES = ['注文確定', '発送準備中', '発送済み', '配達中', '配達完了']
-export const FOOD_STAGES = ['注文受付', '調理中', '配達員が店へ移動中', '配達中', '到着']
+export const FOOD_STAGES = ['注文受付', '配達員を探しています', '調理中', '配達員が店へ移動中', '配達中', '到着']
+export const FOOD_STAGES_SHORT = ['受付', '配達員探し', '調理中', '店へ移動', '配達中', '到着']
 // 注文から完了までを1としたとき、各段階が終わる位置（最後の1は「完了」）
 const EDGES = [0.05, 0.3, 0.75, 1]
-const FOOD_EDGES = [0.05, 0.45, 0.6, 1]
+// 受付 → 配達員探し(約10%) → 調理中 → 店へ移動 → 配達中。配達員が決まるのは 0.14
+const FOOD_EDGES = [0.04, 0.14, 0.45, 0.6, 1]
 
 /** 注文時に1度だけ決める「注文から配達完了までの実際にかかる時間(ms)」。以後の状態はこれと注文時刻だけで決まる */
 export function playMsFor(speed: Speed, placed: Date, express: boolean): number {
@@ -58,9 +60,9 @@ export function statusAt(order: Timed, now: Date) {
   }
 }
 
-/** デリバリーの状況。地図に配達員を出すのは stage 2（店へ移動）と 3（配達中） */
+/** デリバリーの状況。地図に配達員を出すのは stage 3（店へ移動）と 4（配達中）。配達員が決まるのは stage 2 から */
 export function foodStatusAt(order: Timed, now: Date) {
   const { progress, remainingMs } = progressOf(order, now)
   const stage = stageOf(progress, FOOD_EDGES)
-  return { stage, label: FOOD_STAGES[stage], progress, done: stage === 4, onMap: stage === 2 || stage === 3, remainingMs }
+  return { stage, label: FOOD_STAGES[stage], progress, done: stage === 5, searching: stage === 1, courierAssigned: stage >= 2, onMap: stage === 3 || stage === 4, remainingMs }
 }

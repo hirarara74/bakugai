@@ -9,14 +9,15 @@ export const PRICE_BANDS: [string, string, number, number][] = [
   ['3', '¥3,000〜¥10,000', 3000, 10000], ['4', '¥10,000〜', 10000, Infinity],
 ]
 
-export type Query = { q?: string; cat?: string; band?: string; sort?: string; minRating?: number; express?: boolean }
+export type Query = { q?: string; cat?: string; brand?: string; band?: string; sort?: string; minRating?: number; express?: boolean }
 
 /** 空白区切りの語がすべて「商品名・ブランド・カテゴリ名」のどこかに含まれる商品を、指定順で返す */
-export function searchProducts({ q = '', cat, band = '', sort = 'recommended', minRating = 0, express = false }: Query): Product[] {
+export function searchProducts({ q = '', cat, brand, band = '', sort = 'recommended', minRating = 0, express = false }: Query): Product[] {
   const words = q.toLowerCase().split(/\s+/).filter(Boolean)
   const [, , lo, hi] = PRICE_BANDS.find((b) => b[0] === band) ?? PRICE_BANDS[0]
   const list = PRODUCTS.filter((p) => {
     if (cat && p.category !== cat) return false
+    if (brand && p.brand !== brand) return false
     if (p.priceYen < lo || p.priceYen >= hi) return false
     if (p.rating < minRating) return false
     if (express && !p.express) return false
