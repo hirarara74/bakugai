@@ -1,15 +1,18 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
+import type { Speed } from '../lib/delivery'
 
 // お届け先はダミー。端末の localStorage にだけ保存し、外へは送らない
 export type Address = { name: string; zip: string; address: string }
-type Profile = { address: Address; setAddress: (a: Partial<Address>) => void }
+type Profile = { address: Address; setAddress: (a: Partial<Address>) => void; speed: Speed; setSpeed: (s: Speed) => void }
 
 export const useProfile = create<Profile>()(
   persist(
     (set) => ({
       address: { name: '爆買い 太郎', zip: '999-0001', address: 'ノヴァ県 月見市 星ヶ丘 1-2-3' },
       setAddress: (a) => set((s) => ({ address: { ...s.address, ...a } })),
+      speed: 'fast',
+      setSpeed: (speed) => set({ speed }),
     }),
     { name: 'bakugai:profile:v1', version: 1 },
   ),

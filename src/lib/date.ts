@@ -12,11 +12,18 @@ export function dateLabel(target: Date, now: Date): string {
 }
 
 /** 15時までの注文を受け付け、お急ぎ便は翌日、通常は3日後に届く（架空ルール）。ページを開いた時刻から毎回計算する */
-export function deliveryInfo(now: Date, express: boolean) {
+function schedule(now: Date, express: boolean) {
   const cutoff = new Date(now.getFullYear(), now.getMonth(), now.getDate(), CUTOFF_HOUR)
   if (now >= cutoff) cutoff.setDate(cutoff.getDate() + 1)
   const delivery = new Date(cutoff)
   delivery.setDate(delivery.getDate() + (express ? 1 : 3))
+  return { cutoff, delivery }
+}
+
+export const deliveryDate = (now: Date, express: boolean) => schedule(now, express).delivery
+
+export function deliveryInfo(now: Date, express: boolean) {
+  const { cutoff, delivery } = schedule(now, express)
   const mins = Math.floor((cutoff.getTime() - now.getTime()) / 60000)
   return { label: dateLabel(delivery, now), hours: Math.floor(mins / 60), minutes: mins % 60 }
 }

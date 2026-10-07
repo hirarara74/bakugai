@@ -2,6 +2,7 @@ import { useRef, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { cartItems, toLine } from '../../lib/cart'
 import { deliveryInfo } from '../../lib/date'
+import { playMsFor } from '../../lib/delivery'
 import { EXPRESS_FEE, STANDARD_FEE, totals, yen, type Method } from '../../lib/money'
 import { useOrders } from '../../store/useOrders'
 import { ZIP_TABLE, useProfile } from '../../store/useProfile'
@@ -17,7 +18,7 @@ export default function Checkout() {
   const cart = useShop((s) => s.cart)
   const clear = useShop((s) => s.clear)
   const place = useOrders((s) => s.place)
-  const { address, setAddress } = useProfile()
+  const { address, setAddress, speed } = useProfile()
   const [step, setStep] = useState(0)
   const [method, setMethod] = useState<Method>('standard')
   const [slot, setSlot] = useState(SLOTS[0])
@@ -51,6 +52,7 @@ export default function Checkout() {
     const id = place({
       kind: 'shop', lines, subtotal: t.subtotal, shipping: t.shipping, total: t.total, points: t.points,
       method, slot, dropoff, name: address.name, address: `${address.zip} ${address.address}`,
+      playMs: playMsFor(speed, new Date(), method === 'express'),
     })
     nav(`/order/${id}`, { replace: true, state: { fresh: true } })
     clear()

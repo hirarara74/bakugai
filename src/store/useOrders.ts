@@ -16,7 +16,8 @@ export type Order = {
   dropoff: string
   name: string
   address: string
-  placedAt: string // ISO。配送状況はこの時刻からの経過時間で毎回計算する
+  placedAt: string // ISO。配送状況はこの時刻と playMs から毎回計算する
+  playMs: number // 注文から配達完了までにかかる実時間(ms)。注文時の「配送の進み方」設定で決まる
 }
 
 type Orders = {
@@ -36,7 +37,16 @@ export const useOrders = create<Orders>()(
         return id
       },
     }),
-    { name: 'bakugai:orders:v1', version: 1 },
+    {
+      name: 'bakugai:orders:v1',
+      version: 2,
+      // v1 の注文には playMs がない。早送り相当（2分）で補う
+      migrate: (state, from) => {
+        const s = state as { orders: Order[] }
+        if (from < 2) s.orders = s.orders.map((o) => ({ ...o, playMs: o.playMs ?? 120_000 }))
+        return s
+      },
+    },
   ),
 )
 

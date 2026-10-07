@@ -1,4 +1,5 @@
 import { Link, useLocation, useParams } from 'react-router-dom'
+import Tracking from '../../components/Tracking'
 import { deliveryInfo } from '../../lib/date'
 import { yen } from '../../lib/money'
 import { useOrders } from '../../store/useOrders'
@@ -25,6 +26,8 @@ export default function OrderDetail() {
           <Link to="/" className="rounded-full bg-gold px-4 py-2 text-mall-dark">買い物を続ける</Link>
         </div>
       </section>
+
+      <Tracking order={order} />
 
       <section className="rounded-lg border border-dashed border-gray-400 bg-white p-5 text-sm" aria-label="確認メール">
         <p className="text-xs text-gray-500">件名: 【BAKUGAI MALL】ご注文を受け付けました（架空のメールです）</p>
